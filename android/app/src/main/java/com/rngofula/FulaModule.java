@@ -1,4 +1,5 @@
 package com.rngofula;
+import android.net.Uri;
 import android.util.Log;
 
 import com.facebook.react.bridge.NativeModule;
@@ -7,6 +8,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
+
+import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -16,9 +19,11 @@ import fula.Fula_;
 
 public class FulaModule extends ReactContextBaseJavaModule {
     Fula_ fula;
+    String appDirs;
     FulaModule(ReactApplicationContext context) {
         super(context);
-        fula = Fula.newFula();
+        appDirs = context.getFilesDir().toString();
+        fula = Fula.newFula(appDirs);
     }
 
     @Override
@@ -39,6 +44,7 @@ public class FulaModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void connect(String boxId, Promise promise) {
+        Log.d("fulaModule", appDirs);
         try{
             fula.connect(boxId);
             promise.resolve(true);
@@ -49,16 +55,13 @@ public class FulaModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void receiveMeta(String fileId, Promise promise) {
+    public void receive(String fileId, Promise promise) {
         try{
-            String meta = fula.receiveMeta(fileId);
-            promise.resolve(meta);
+            String filePath = fula.receive(fileId);
+            String uriPath = Uri.fromFile(new File(filePath)).toString();
+            promise.resolve(uriPath);
         }catch (Exception e){
             promise.reject(e);
         }
-    }
-
-    public void onHostDestroy() {
-        Log.d("FulaModule", "I think we fucked");
     }
 }

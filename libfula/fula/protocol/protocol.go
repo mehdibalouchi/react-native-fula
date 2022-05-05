@@ -24,11 +24,28 @@ func protocolHandler(s network.Stream) {
 	fmt.Println("we are at the protocol")
 }
 
+func ReceiveFile(stream network.Stream, cid string) []byte {
+	reqMsg := &pb.Request{Type: &pb.Request_Receive{Receive: &pb.Chunk{Id: cid}}}
+	header, err := proto.Marshal(reqMsg)
+	if err != nil {
+		panic(err)
+	}
+	_, err = stream.Write(header)
+	if err != nil {
+		panic(err)
+	}
+	stream.CloseWrite()
+	buf, err := ioutil.ReadAll(stream)
+	if err != nil {
+		panic(err)
+	}
+	return buf
+}
+
 func ReceiveMeta(stream network.Stream, cid string) *pb.Meta {
 	reqMsg := &pb.Request {
 		Type: &pb.Request_Meta{Meta: cid}}
 
-		fmt.Println("req", reqMsg)
 	header, err := proto.Marshal(reqMsg)
 	if err != nil {
 		panic(err)
@@ -66,7 +83,7 @@ func SendFile(file *os.File, stream network.Stream) string {
 	reqMsg := &pb.Request{
 		Type: &pb.Request_Send{
 			Send: &pb.Meta{
-				Name:         file.Name(),
+				Name:         stat.Name(),
 				Size_:        uint64(stat.Size()),
 				LastModified: stat.ModTime().Unix(),
 				Type:         mtype.String()}}}
@@ -82,6 +99,7 @@ func SendFile(file *os.File, stream network.Stream) string {
 	}
 	fmt.Println("header sent")
 	fmt.Println(stat.Size())
+	//TODO: Reading should be fixed
 	buffer := make([]byte, stat.Size())
 	n, err := file.ReadAt(buffer, 0)
 	if err == io.EOF {
@@ -99,10 +117,11 @@ func SendFile(file *os.File, stream network.Stream) string {
 	}
 	fmt.Println("file sended")
 	stream.CloseWrite()
-	buf2 := make([]byte, 1024)
-	stream.Read(buf2)
+	buf2, err := ioutil.ReadAll(stream)
 	fmt.Println("read happend sended")
 	id := string(buf2)
 	fmt.Println(id)
 	return id
 }
+
+

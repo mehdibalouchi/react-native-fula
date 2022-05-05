@@ -15,48 +15,23 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  Image,
   useColorScheme,
   View,
   NativeModules,
+  Button
 } from 'react-native';
+
+import DocumentPicker, {
+  DocumentPickerResponse,
+  isInProgress,
+} from 'react-native-document-picker'
 
 import {
   Colors,
-  DebugInstructions,
   Header,
-  LearnMoreLinks,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-
-const Section: React.FC<{
-  title: string;
-}> = ({ children, title }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -64,20 +39,39 @@ const App = () => {
 
   useEffect(() => {
     (async () => {
-      await FulaModule.connect("/ip4/192.168.246.234/tcp/4003/ws/p2p/12D3KooWLJcUKiY433MEsMX7jofKw2Qj5ogTNiJdAeX3hC9wLjkr");
+      await FulaModule.connect("/ip4/192.168.1.10/tcp/4002/p2p/12D3KooWDVgPHx45ZsnNPyeQooqY8VNesSR2KiX2mJwzEK5hpjpb");
       console.log("connected")
 
-      const cid = await FulaModule.send('/storage/emulated/0/DCIM/Camera/20220222_133812.heic')
-      console.log("file saved with CID: ", cid)
+      // const cid = await FulaModule.send('/storage/emulated/0/DCIM/Camera/20220222_133812.heic')
+      // console.log("file saved with CID: ", cid)
 
-      const meta = await FulaModule.receiveMeta(cid)
-      console.log(meta)
+      // const filepath = await FulaModule.receive(cid)
+      // console.log(filepath)
     })()
 
     // console.log("connected")
     // const cid = FulaModule.send('/storage/emulated/0/Download/farhoud_meeting.txt')
     // console.log(cid)
   });
+
+  const [result, setResult] = React.useState<DocumentPickerResponse | undefined | null>()
+  const [cid, setCid] = React.useState<string | undefined | null>()
+  const [filePath, setFilePath] = React.useState<string | undefined | null>()
+
+  useEffect(() => {
+    console.log(JSON.stringify(result, null, 2))
+  }, [result])
+
+  const handleError = (err: unknown) => {
+    if (DocumentPicker.isCancel(err)) {
+      console.warn('cancelled')
+      // User cancelled the picker, exit any dialogs or menus and move on
+    } else if (isInProgress(err)) {
+      console.warn('multiple pickers were opened, only the last will be considered')
+    } else {
+      throw err
+    }
+  }
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -94,20 +88,51 @@ const App = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          <Button
+            title="open picker for single file selection"
+            onPress={async () => {
+              try {
+                const pickerResult = await DocumentPicker.pickSingle({
+                  presentationStyle: 'fullScreen',
+                  copyTo: 'documentDirectory',
+                })
+                setResult(pickerResult)
+              } catch (e) {
+                handleError(e)
+              }
+            }}
+          />
+          <Button
+            title="send"
+            onPress={async () => {
+              try {
+                if (result) {
+                  const _filePath = result.fileCopyUri?.split("file:")[1]
+                  const _cid = await FulaModule.send(_filePath)
+                  console.log("file saved with CID: ", _cid)
+                  setCid(_cid)
+                }
+              } catch (e) {
+                handleError(e)
+              }
+            }}
+          />
+          <Button
+            title="get"
+            onPress={async () => {
+              try {
+                if (result) {
+                  const _filepath = await FulaModule.receive(cid)
+                  console.log(_filepath)
+                  setFilePath(_filepath)
+                }
+              } catch (e) {
+                handleError(e)
+              }
+            }}
+          />
+          {filePath &&<Image source={{uri: `${filePath}`}}></Image>}
+          {filePath &&<Text>{filePath}</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>

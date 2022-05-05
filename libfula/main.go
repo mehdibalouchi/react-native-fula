@@ -7,18 +7,20 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"time"
 )
 
 func main() {
 
-	fula := fula.NewFula()
-	fula.Connect("/ip4/192.168.246.234/tcp/4002/p2p/12D3KooWLJcUKiY433MEsMX7jofKw2Qj5ogTNiJdAeX3hC9wLjkr")
+	fula := fula.NewFula("/home/farhoud")
+	fula.Connect("/ip4/192.168.1.10/tcp/4002/p2p/12D3KooWDVgPHx45ZsnNPyeQooqY8VNesSR2KiX2mJwzEK5hpjpb")
 	fmt.Println("We are know connected")
-	// cid := fula.Send("/home/farhoud/workspace/functionland/rngofula/libfula/test.txt")
+	cid := fula.Send("/home/farhoud/workspace/functionland/rngofula/libfula/test.txt")
 
-	cid := "QmWNDSNbJ6j9Dohga5q9zRjQ9k7ZCQHQHoyzPVtJXeA9kw"
+	cid = string(cid)
 	fmt.Println("cid", cid)
-	meta := fula.ReceiveMeta(cid)
+	time.Sleep(2 * time.Second)
+	meta := fula.Receive(cid)
 	fmt.Println(meta)
 
 	runtime.Goexit()

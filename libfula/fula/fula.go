@@ -20,25 +20,22 @@ import (
 type IFula interface {
 	Connect()
 	Send()
-	ReceiveMeta()
+	Receive()
 }
 
 type Fula struct {
 	node  host.Host
 	peers []peer.ID
+	appDir string
 }
 
-func NewFula() *Fula {
-
+func NewFula(appDir string) *Fula {
 	node, err := create()
 	if err != nil {
 		panic(err)
 	}
-
-	f := &Fula{node: node}
-
+	f := &Fula{node: node, appDir: appDir}
 	return f
-	
 }
 
 func (f *Fula) Connect(boxAddr string) {
@@ -65,14 +62,21 @@ func (f *Fula) Send(filePath string) string{
 	return res
 }
 
-func (f *Fula) ReceiveMeta(fileId string) string{
+func (f *Fula) Receive(fileId string) string{
 	stream, err := f.node.NewStream(context.Background(), f.peers[0], protocol.Protocol)
 	if err != nil {
 		panic(err)
 	}
-	res := protocol.ReceiveMeta(stream, fileId)
-	fmt.Println("res", res)
-	return res.String()
+	meta := protocol.ReceiveMeta(stream, fileId)
+	stream.Close()
+	stream, err = f.node.NewStream(context.Background(), f.peers[0], protocol.Protocol)
+	file := protocol.ReceiveFile(stream, fileId)
+	fileName := fmt.Sprintf("%s/%s",f.appDir,meta.Name)
+	err = os.WriteFile(fileName, file, 0644)
+	if err != nil {
+		panic(err)
+	}
+	return fileName
 }
 
 func create() (host.Host, error) {
