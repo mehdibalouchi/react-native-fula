@@ -43,7 +43,7 @@ func ReceiveFile(stream network.Stream, cid string) []byte {
 }
 
 func ReceiveMeta(stream network.Stream, cid string) *pb.Meta {
-	reqMsg := &pb.Request {
+	reqMsg := &pb.Request{
 		Type: &pb.Request_Meta{Meta: cid}}
 
 	header, err := proto.Marshal(reqMsg)
@@ -61,7 +61,7 @@ func ReceiveMeta(stream network.Stream, cid string) *pb.Meta {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	meta := &pb.Meta{}
 	err = proto.Unmarshal(buf, meta)
 	if err != nil {
@@ -73,9 +73,9 @@ func ReceiveMeta(stream network.Stream, cid string) *pb.Meta {
 }
 
 func SendFile(file *os.File, stream network.Stream) string {
-	stat, _ := file.Stat()
-	fmt.Println(stat)
-	mtype, err := mimetype.DetectReader(file)
+	fileInfo, _ := os.Lstat(file.Name())
+	fmt.Println(fileInfo)
+	mtype, err := mimetype.DetectFile(file.Name())
 	if err != nil {
 		panic(err)
 	}
@@ -83,9 +83,9 @@ func SendFile(file *os.File, stream network.Stream) string {
 	reqMsg := &pb.Request{
 		Type: &pb.Request_Send{
 			Send: &pb.Meta{
-				Name:         stat.Name(),
-				Size_:        uint64(stat.Size()),
-				LastModified: stat.ModTime().Unix(),
+				Name:         fileInfo.Name(),
+				Size_:        uint64(fileInfo.Size()),
+				LastModified: fileInfo.ModTime().Unix(),
 				Type:         mtype.String()}}}
 
 	header, err := proto.Marshal(reqMsg)
@@ -98,22 +98,26 @@ func SendFile(file *os.File, stream network.Stream) string {
 		panic(err)
 	}
 	fmt.Println("header sent")
-	fmt.Println(stat.Size())
-	//TODO: Reading should be fixed
-	buffer := make([]byte, stat.Size())
-	n, err := file.ReadAt(buffer, 0)
-	if err == io.EOF {
-		fmt.Println(n)
-		fmt.Println("end of file")
-	}
-	if err != nil {
-		fmt.Println("some other error")
-		panic(err)
-	}
-	if n > 0 {
-		fmt.Println("sending chunk")
-		stream.Write(buffer)
-		fmt.Println("chunk sent")
+	fmt.Println(fileInfo.Size())
+	buffer := make([]byte, 1024*10)
+	for {
+		n, err := file.Read(buffer)
+		if err == io.EOF {
+			fmt.Println(n)
+			fmt.Println(buffer)
+			fmt.Println("end of file")
+			break
+		}
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if n > 0 {
+			fmt.Println("sending chunk")
+			stream.Write(buffer[:n])
+			fmt.Println("chunk sent")
+		}
+
 	}
 	fmt.Println("file sended")
 	stream.CloseWrite()
@@ -123,5 +127,3 @@ func SendFile(file *os.File, stream network.Stream) string {
 	fmt.Println(id)
 	return id
 }
-
-
