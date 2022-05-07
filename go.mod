@@ -13,7 +13,7 @@ require (
 	github.com/davidlazar/go-crypto v0.0.0-20200604182044-b73af7476f6c // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/elastic/gosigar v0.14.2 // indirect
-	github.com/farhoud/go-fula v0.0.0-20220507083424-9630741e922d // indirect
+	github.com/farhoud/go-fula v0.0.0-20220507130400-09e40ab9ce3e // indirect
 	github.com/flynn/noise v1.0.0 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect

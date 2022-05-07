@@ -20,7 +20,7 @@ import fula.Fula_;
 public class FulaModule extends ReactContextBaseJavaModule {
     Fula_ fula;
     String appDirs;
-    FulaModule(ReactApplicationContext context) {
+    FulaModule(ReactApplicationContext context) throws Exception{
         super(context);
         appDirs = context.getFilesDir().toString();
         fula = Fula.newFula(appDirs);

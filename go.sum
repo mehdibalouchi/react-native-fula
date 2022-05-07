@@ -153,6 +153,10 @@ github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/farhoud/go-fula v0.0.0-20220507083424-9630741e922d h1:iV1xom2ZusaG+5AXLdTMiaS7kyRZkJP1DrYzh6nEPQ8=
 github.com/farhoud/go-fula v0.0.0-20220507083424-9630741e922d/go.mod h1:yeHjEqbjJv5cuGRhiM5+UutaCFOZz3H8pYdCtDNlcks=
+github.com/farhoud/go-fula v0.0.0-20220507123149-efb04cd0593d h1:NNVjmRAOQLJnRAh0xINn0TndY7mckNuwfUodSrCepy0=
+github.com/farhoud/go-fula v0.0.0-20220507123149-efb04cd0593d/go.mod h1:yeHjEqbjJv5cuGRhiM5+UutaCFOZz3H8pYdCtDNlcks=
+github.com/farhoud/go-fula v0.0.0-20220507130400-09e40ab9ce3e h1:/npG0DzR2ciY92G9/UY7hvPYOYMixGHCMEjTW/vL9Kg=
+github.com/farhoud/go-fula v0.0.0-20220507130400-09e40ab9ce3e/go.mod h1:yeHjEqbjJv5cuGRhiM5+UutaCFOZz3H8pYdCtDNlcks=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
 github.com/flynn/noise v1.0.0 h1:DlTHqmzmvcEiKj+4RYo/imoswx/4r6iBlCMfVtrMXpQ=
