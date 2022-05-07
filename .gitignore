@@ -61,4 +61,4 @@ buck-out/
 /vendor/bundle/
 
 /android/app/fula-sources.jar
-/android/app/fula.arr
+/android/app/fula.aar
