@@ -9,8 +9,12 @@
 
 ### Dependency
 - `github.com/farhoud/go-fula/fula`
+```
+go get github.com/farhoud/go-fula/fula
+```
+If change the happened in go code you should run this again
 
-Build .aar with:
+#### Build .aar with:
 ```
 gomobile bind -v  -o android/app/fula.aar -target=android github.com/farhoud/go-fula/fula
 ```
