@@ -64,4 +64,15 @@ public class FulaModule extends ReactContextBaseJavaModule {
             promise.reject(e);
         }
     }
+
+    @ReactMethod void graphQL(String query, String variableValues, Promise promise) {
+        try {
+            Log.d("valuees", variableValues);
+            String res = fula.graphQL(query, variableValues);
+            promise.resolve(res);
+        }catch (Exception e){
+            promise.reject(e);
+        }
+    }
+
 }

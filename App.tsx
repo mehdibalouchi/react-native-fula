@@ -39,8 +39,8 @@ const App = () => {
 
   useEffect(() => {
     (async () => {
-      await FulaModule.connect("/ip4/192.168.1.10/tcp/4002/p2p/12D3KooWDVgPHx45ZsnNPyeQooqY8VNesSR2KiX2mJwzEK5hpjpb");
-      console.log("connected")
+      await FulaModule.connect("/ip4/192.168.1.12/tcp/4002/p2p/12D3KooWRDBvNPv7zPrXoo7KwhpMxgS3Qga4tKKjtbexQnGSvdni");
+      console.log("connected", "/ip4/192.168.1.12/tcp/4002/p2p/12D3KooWRDBvNPv7zPrXoo7KwhpMxgS3Qga4tKKjtbexQnGSvdni")
 
       // const cid = await FulaModule.send('/storage/emulated/0/DCIM/Camera/20220222_133812.heic')
       // console.log("file saved with CID: ", cid)
@@ -57,6 +57,7 @@ const App = () => {
   const [result, setResult] = React.useState<DocumentPickerResponse | undefined | null>()
   const [cid, setCid] = React.useState<string | undefined | null>()
   const [filePath, setFilePath] = React.useState<string | undefined | null>()
+  const [res, setRes] = React.useState<string | undefined | null>()
 
   useEffect(() => {
     console.log(JSON.stringify(result, null, 2))
@@ -131,8 +132,43 @@ const App = () => {
               }
             }}
           />
+          <Button
+            title="GraphQL"
+            onPress={
+              async () => {
+                const query = `
+                query {
+                  read(input:{
+                  collection:"todo",
+                  filter:{}
+                  }){
+                  id
+                  text
+                  isComplete
+                  }
+                } 
+                `
+                // const query = `
+                // mutation addTodo($values:JSON){
+                //   create(input:{
+                //   collection:"todo",
+                //   values: $values
+                //   }){
+                //   id
+                //   text
+                //   isComplete
+                //   }
+                // }
+                // `
+                const _res = await FulaModule.graphQL(query, JSON.stringify({values: [{"id": "3", "text": "todo3", "isComplete": false}]}))
+                console.log("RES", _res)
+                setRes(_res)
+              }
+            }
+            />
           {filePath &&<Image source={{uri: `${filePath}`}}></Image>}
           {filePath &&<Text>{filePath}</Text>}
+          {res &&<Text>{res}</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>
